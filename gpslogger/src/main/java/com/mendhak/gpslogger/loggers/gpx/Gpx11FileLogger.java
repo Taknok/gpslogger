@@ -13,17 +13,19 @@ public class Gpx11FileLogger extends Gpx10FileLogger {
         super(gpxFile, addNewTrackSegment);
     }
 
-    public Runnable getWriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment)
+    public Runnable getWriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment, float[] rotation)
     {
-        return new Gpx11WriteHandler(dateTimeString, gpxFile, loc, addNewTrackSegment);
+        return new Gpx11WriteHandler(dateTimeString, gpxFile, loc, addNewTrackSegment, rotation);
     }
 
 }
-
 class Gpx11WriteHandler extends Gpx10WriteHandler {
 
-    public Gpx11WriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment) {
+    float[] rotation;
+
+    public Gpx11WriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment, float[] rotation) {
         super(dateTimeString, gpxFile, loc, addNewTrackSegment);
+        this.rotation = rotation;
     }
 
     String getBeginningXml(String dateTimeString){
@@ -53,6 +55,12 @@ class Gpx11WriteHandler extends Gpx10WriteHandler {
         if (loc.hasSpeed()) {
             track.append("<gpxtpx:speed>").append(String.valueOf(loc.getSpeed())).append("</gpxtpx:speed>");
         }
+
+        track.append("<gpxtpx:rotation>");
+        track.append("<gpxtpx:Azimuth>").append(String.valueOf(rotation[0])).append("</gpxtpx:Azimuth>");
+        track.append("<gpxtpx:Pitch>").append(String.valueOf(rotation[1])).append("</gpxtpx:Pitch>");
+        track.append("<gpxtpx:Roll>").append(String.valueOf(rotation[2])).append("</gpxtpx:Roll>");
+        track.append("</gpxtpx:rotation>");
 
         track.append("</gpxtpx:TrackPointExtension></extensions>");
     }

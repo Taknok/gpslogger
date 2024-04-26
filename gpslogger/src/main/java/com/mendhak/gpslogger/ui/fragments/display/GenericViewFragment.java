@@ -90,6 +90,9 @@ public abstract class GenericViewFragment extends Fragment {
         //Literally keeping this here only because the eventbus requries at least one onEvent method in this class.
     }
 
+    public void requestZeroRotation() {
+        EventBus.getDefault().post(new CommandEvents.requestZeroRotation());
+    }
 
     public void requestToggleLogging() {
 

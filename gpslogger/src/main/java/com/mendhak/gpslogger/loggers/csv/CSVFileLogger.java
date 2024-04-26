@@ -21,7 +21,6 @@ package com.mendhak.gpslogger.loggers.csv;
 
 import android.content.Context;
 import android.location.Location;
-import androidx.annotation.Nullable;
 
 import com.mendhak.gpslogger.common.BatteryInfo;
 import com.mendhak.gpslogger.common.BundleConstants;
@@ -82,7 +81,7 @@ public class CSVFileLogger implements FileLogger {
     }
 
     @Override
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
         if (!Session.getInstance().hasDescription()) {
             annotate("", loc);
         }

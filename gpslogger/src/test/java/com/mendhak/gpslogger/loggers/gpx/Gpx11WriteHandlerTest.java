@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class Gpx11WriteHandlerTest {
     @Test
     public void InitialXmlLength_Verify(){
-        Gpx11WriteHandler writeHandler = new Gpx11WriteHandler(null, null, null, true);
+        Gpx11WriteHandler writeHandler = new Gpx11WriteHandler(null, null, null, true, new float[3]);
         Gpx10AnnotateHandler annotateHandler = new Gpx10AnnotateHandler(null, null,
                 null, null,
                 writeHandler.getBeginningXml(Strings.getIsoDateTime(new Date(1483054318298l))).length());

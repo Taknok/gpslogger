@@ -25,7 +25,6 @@ import android.os.Build;
 import com.mendhak.gpslogger.BuildConfig;
 import com.mendhak.gpslogger.R;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

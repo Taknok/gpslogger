@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.mendhak.gpslogger.R;
@@ -45,6 +46,7 @@ import org.slf4j.Logger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +59,14 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
     private static final Logger LOG = Logs.of(GpsDetailedViewFragment.class);
     private PreferenceHelper preferenceHelper = PreferenceHelper.getInstance();
     private Session session = Session.getInstance();
+
+    private ActionProcessButton zeroRotationButton;
+    private EditText[] manualOffsetButtons;
+
+    private float[] mRotationOffset;
+
+    private float[] mManualOffset;
+
 
     public static GpsDetailedViewFragment newInstance() {
 
@@ -79,6 +89,15 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         actionButton = (ActionProcessButton)rootView.findViewById(R.id.btnActionProcess);
         actionButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accentColor ));
 
+        zeroRotationButton = (ActionProcessButton)rootView.findViewById(R.id.btnZeroRotation);
+        zeroRotationButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accentColor ));
+
+        manualOffsetButtons = new EditText[3];
+        manualOffsetButtons[0] = rootView.findViewById(R.id.detailedview_offset_azimuth);
+        manualOffsetButtons[1] = rootView.findViewById(R.id.detailedview_offset_pitch);
+        manualOffsetButtons[2] = rootView.findViewById(R.id.detailedview_offset_roll);
+
+
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,6 +105,12 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
             }
         });
 
+        zeroRotationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestZeroRotation();
+            }
+        });
 
         if (session.hasValidLocation()) {
             displayLocationInfo(session.getCurrentLocationInfo());
@@ -93,20 +118,55 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
         showPreferencesAndMessages();
 
+        mRotationOffset = new float[3];
+        Arrays.fill(mRotationOffset, 0);
+        showRotationOffset();
+
+        mManualOffset = new float[3];
+        Arrays.fill(mManualOffset, 0);
+        showManualOffset();
+
         return rootView;
     }
 
+    private void lockSetZero() {
+        zeroRotationButton.setClickable(false);
+        zeroRotationButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.lockColor));
+    }
+
+    private void unlockSetZero() {
+        zeroRotationButton.setClickable(true);
+        zeroRotationButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accentColor));
+    }
+
+    private void lockManual() {
+        manualOffsetButtons[0].setClickable(false);
+        manualOffsetButtons[1].setClickable(false);
+        manualOffsetButtons[2].setClickable(false);
+    }
+
+    private void unlockManual() {
+        manualOffsetButtons[0].setClickable(true);
+        manualOffsetButtons[1].setClickable(true);
+        manualOffsetButtons[2].setClickable(true);
+    }
 
     private void setActionButtonStart(){
         actionButton.setText(R.string.btn_start_logging);
         actionButton.setBackgroundColor( ContextCompat.getColor(getActivity(), R.color.accentColor));
         actionButton.setAlpha(0.8f);
+
+        unlockSetZero();
+        unlockManual();
     }
 
     private void setActionButtonStop(){
         actionButton.setText(R.string.btn_stop_logging);
         actionButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accentColorComplementary));
         actionButton.setAlpha(0.8f);
+
+        lockSetZero();
+        lockManual();
     }
 
     @Override
@@ -127,6 +187,8 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         }
 
         showPreferencesAndMessages();
+        showRotationOffset();
+        showManualOffset();
         super.onResume();
     }
 
@@ -246,6 +308,22 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
     }
 
+    private void showRotationOffset() {
+        TextView txtRotAzimuth = (TextView) rootView.findViewById(R.id.detailedview_rotation_azimuth_text);
+        TextView txtRotPitch = (TextView) rootView.findViewById(R.id.detailedview_rotation_pitch_text);
+        TextView txtRotRoll = (TextView) rootView.findViewById(R.id.detailedview_rotation_roll_text);
+
+        txtRotAzimuth.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[0]))));
+        txtRotPitch.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[1]))));
+        txtRotRoll.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[2]))));
+    }
+
+    private void showManualOffset() {
+        manualOffsetButtons[0].setText(String.format("%s", Math.toDegrees(mManualOffset[0])));
+        manualOffsetButtons[1].setText(String.format("%s", Math.toDegrees(mManualOffset[1])));
+        manualOffsetButtons[2].setText(String.format("%s", Math.toDegrees(mManualOffset[2])));
+    }
+
     public void showCurrentFileName(String newFileName) {
 
         TextView txtFilename = (TextView) rootView.findViewById(R.id.detailedview_file_text);
@@ -300,6 +378,12 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
     }
 
     @EventBusHook
+    public void onEventMainThread(ServiceEvents.RotationOffsetUpdate rotationOffsetEvent){
+        mRotationOffset = rotationOffsetEvent.rotationOffset;
+        showRotationOffset();
+    }
+
+    @EventBusHook
     public void onEventMainThread(ServiceEvents.SatellitesVisible satellitesVisible){
         setSatelliteCount(satellitesVisible.satelliteCount);
     }
@@ -309,6 +393,7 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         if(loggingStatus.loggingStarted){
             setActionButtonStop();
             showPreferencesAndMessages();
+            showRotationOffset();
             clearDisplay();
         }
         else {
@@ -327,6 +412,7 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         }
 
         showPreferencesAndMessages();
+        showRotationOffset();
 
         TextView tvLatitude = (TextView) rootView.findViewById(R.id.detailedview_lat_text);
         TextView tvLongitude = (TextView) rootView.findViewById(R.id.detailedview_lon_text);

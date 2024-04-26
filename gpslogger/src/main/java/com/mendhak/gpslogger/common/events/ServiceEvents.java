@@ -35,6 +35,12 @@ public class ServiceEvents {
         }
     }
 
+    public static class RotationOffsetUpdate {
+        public float[] rotationOffset;
+        public RotationOffsetUpdate(float[] rotationOffset) { this.rotationOffset = rotationOffset; }
+
+    }
+
     /**
      * Number of visible satellites
      */

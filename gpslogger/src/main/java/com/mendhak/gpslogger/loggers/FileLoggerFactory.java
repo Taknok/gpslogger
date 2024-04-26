@@ -24,6 +24,7 @@ import android.location.Location;
 import com.mendhak.gpslogger.common.PreferenceHelper;
 import com.mendhak.gpslogger.common.Session;
 import com.mendhak.gpslogger.common.Strings;
+import com.mendhak.gpslogger.common.slf4j.Logs;
 import com.mendhak.gpslogger.loggers.csv.CSVFileLogger;
 import com.mendhak.gpslogger.loggers.customurl.CustomUrlLogger;
 import com.mendhak.gpslogger.loggers.geojson.GeoJSONLogger;
@@ -32,6 +33,7 @@ import com.mendhak.gpslogger.loggers.gpx.Gpx11FileLogger;
 import com.mendhak.gpslogger.loggers.kml.Kml22FileLogger;
 import com.mendhak.gpslogger.loggers.opengts.OpenGTSLogger;
 
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -98,9 +100,11 @@ public class FileLoggerFactory {
         return loggers;
     }
 
-    public static void write(Context context, Location loc) throws Exception {
+    private static final Logger LOG = Logs.of(FileLoggerFactory.class);
+    public static void write(Context context, Location loc, float[] rotation) throws Exception {
+        LOG.debug("Write logger");
         for (FileLogger logger : getFileLoggers(context)) {
-            logger.write(loc);
+            logger.write(loc, rotation);
         }
     }
 

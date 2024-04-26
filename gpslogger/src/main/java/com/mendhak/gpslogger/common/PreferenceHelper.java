@@ -559,7 +559,7 @@ public class PreferenceHelper {
      */
     @ProfilePreference(name= PreferenceNames.LOG_AS_GPX_11)
     public boolean shouldLogAsGpx11() {
-        return prefs.getBoolean(PreferenceNames.LOG_AS_GPX_11, false);
+        return prefs.getBoolean(PreferenceNames.LOG_AS_GPX_11, true);
     }
 
 
@@ -818,7 +818,7 @@ public class PreferenceHelper {
      */
     @ProfilePreference(name= PreferenceNames.AUTOSEND_FREQUENCY)
     public int getAutoSendInterval() {
-        return Math.round(Float.parseFloat(prefs.getString(PreferenceNames.AUTOSEND_FREQUENCY, "60")));
+        return Math.round(Float.parseFloat(prefs.getString(PreferenceNames.AUTOSEND_FREQUENCY, "1")));
     }
 
     public void setAutoSendInterval(String frequency){

@@ -48,6 +48,8 @@ import com.mendhak.gpslogger.loggers.Files;
 
 import org.slf4j.Logger;
 
+import java.util.Arrays;
+
 
 public class GpsSimpleViewFragment extends GenericViewFragment implements View.OnClickListener {
 
@@ -58,6 +60,10 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
 
     private View rootView;
     private ActionProcessButton actionButton;
+
+    private ActionProcessButton zeroRotationButton;
+
+    private float[] mRotationOffset;
 
     public GpsSimpleViewFragment() {
 
@@ -99,6 +105,10 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
         actionButton.setMode(ActionProcessButton.Mode.ENDLESS);
         actionButton.setBackgroundColor(ContextCompat.getColor(context, (R.color.accentColor)));
 
+        zeroRotationButton = (ActionProcessButton)rootView.findViewById(R.id.btnZeroRotation);
+        zeroRotationButton.setMode((ActionProcessButton.Mode.ENDLESS));
+        zeroRotationButton.setBackgroundColor(ContextCompat.getColor(context, (R.color.accentColor)));
+
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,10 +116,21 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
             }
         });
 
+        zeroRotationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestZeroRotation();
+            }
+        });
+
 
         if (session.hasValidLocation()) {
             displayLocationInfo(session.getCurrentLocationInfo());
         }
+
+        mRotationOffset = new float[5];
+        Arrays.fill(mRotationOffset, 0);
+        showRotationOffset();
 
         return rootView;
     }
@@ -179,8 +200,15 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
 
     }
 
+    private void showRotationOffset() {
+        TextView txtRotAzimuth = (TextView) rootView.findViewById(R.id.simpleview_rotation_azimuth_text);
+        TextView txtRotPitch = (TextView) rootView.findViewById(R.id.simpleview_rotation_pitch_text);
+        TextView txtRotRoll = (TextView) rootView.findViewById(R.id.simpleview_rotation_roll_text);
 
-
+        txtRotAzimuth.setText(Double.toString(Math.toDegrees(mRotationOffset[0])) + "°");
+        txtRotPitch.setText(Double.toString(Math.toDegrees(mRotationOffset[1])) + "°");
+        txtRotRoll.setText(Double.toString(Math.toDegrees(mRotationOffset[2])) + "°");
+    }
 
     private void showCurrentFileName(String newFileName) {
         TextView txtFilename = (TextView) rootView.findViewById(R.id.simpleview_txtfilepath);
@@ -272,6 +300,7 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
     @Override
     public void onResume() {
         showPreferencesSummary();
+        showRotationOffset();
 
         if(session.isStarted()){
             setActionButtonStop();
@@ -295,6 +324,12 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
     }
 
     @EventBusHook
+    public void onEventMainThread(ServiceEvents.RotationOffsetUpdate rotationOffsetEvent){
+        mRotationOffset = rotationOffsetEvent.rotationOffset;
+        showRotationOffset();
+    }
+
+    @EventBusHook
     public void onEventMainThread(ServiceEvents.SatellitesVisible satellitesVisible){
         setSatelliteCount(satellitesVisible.satelliteCount);
     }
@@ -309,6 +344,7 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
 
         if(loggingStatus.loggingStarted){
             showPreferencesSummary();
+            showRotationOffset();
             clearLocationDisplay();
             setActionButtonStop();
         }
@@ -325,6 +361,7 @@ public class GpsSimpleViewFragment extends GenericViewFragment implements View.O
 
     public void displayLocationInfo(Location locationInfo){
         showPreferencesSummary();
+        showRotationOffset();
 
         EditText txtLatitude = (EditText) rootView.findViewById(R.id.simple_lat_text);
         txtLatitude.setText(Strings.getFormattedLatitude(locationInfo.getLatitude()));

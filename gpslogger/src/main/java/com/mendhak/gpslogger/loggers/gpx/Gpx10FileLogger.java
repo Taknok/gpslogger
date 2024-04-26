@@ -52,7 +52,7 @@ public class Gpx10FileLogger implements FileLogger {
         this.addNewTrackSegment = addNewTrackSegment;
     }
 
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
         long time = loc.getTime();
         if (time <= 0) {
             time = System.currentTimeMillis();
@@ -62,11 +62,11 @@ public class Gpx10FileLogger implements FileLogger {
             dateTimeString = Strings.getIsoDateTimeWithOffset(new Date(time));
         }
 
-        Runnable writeHandler = getWriteHandler(dateTimeString, gpxFile, loc, addNewTrackSegment);
+        Runnable writeHandler = getWriteHandler(dateTimeString, gpxFile, loc, addNewTrackSegment, rotation);
         EXECUTOR.execute(writeHandler);
     }
 
-    public Runnable getWriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment)
+    public Runnable getWriteHandler(String dateTimeString, File gpxFile, Location loc, boolean addNewTrackSegment, float[] rotation)
     {
         return new Gpx10WriteHandler(dateTimeString, gpxFile, loc, addNewTrackSegment);
     }
@@ -90,7 +90,9 @@ public class Gpx10FileLogger implements FileLogger {
 
     public Runnable getAnnotateHandler(String description, File gpxFile, Location loc, String dateTimeString){
         //Use the writer to calculate initial XML length, use that as offset for annotations
-        Gpx10WriteHandler writer = (Gpx10WriteHandler)getWriteHandler(dateTimeString, gpxFile, loc, true);
+        float[] rot = new float[3];
+
+        Gpx10WriteHandler writer = (Gpx10WriteHandler)getWriteHandler(dateTimeString, gpxFile, loc, true, rot);
         return new Gpx10AnnotateHandler(description, gpxFile, loc, dateTimeString, writer.getBeginningXml(dateTimeString).length());
     }
 

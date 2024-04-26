@@ -54,6 +54,7 @@
     <color name="accentColor">#448aff</color>
     <color name="errorColor">#FF5252</color>
     <color name="warningColor">#ffbd60</color>
+    <color name="lockColor">#727272</color>
     <color name="accentColorComplementary">#4CAF50</color>
     <color name="primaryColorLight">#ffdee7eb</color>
     <color name="primaryColorText">#212121</color>

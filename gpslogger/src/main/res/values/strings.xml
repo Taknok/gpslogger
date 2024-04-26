@@ -492,5 +492,10 @@
 
     <string name="annotation_edit_button_label">Edit annotation button</string>
     <string name="annotation_edit_button_color">Button color</string>
+    <string name="btn_zero_rotation">Set Zero</string>
+    <string name="txt_rotation_azimuth">Offset Azimuth</string>
+    <string name="txt_rotation_pitch">Offset Pitch</string>
+    <string name="txt_rotation_roll">Offset Roll</string>
+    <string name="manual_offset">Manual Offset</string>
 
 </resources>

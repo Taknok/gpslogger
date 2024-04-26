@@ -59,7 +59,7 @@ public class CustomUrlLogger implements FileLogger {
     }
 
     @Override
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
         if (!Session.getInstance().hasDescription()) {
             annotate("", loc);
         }

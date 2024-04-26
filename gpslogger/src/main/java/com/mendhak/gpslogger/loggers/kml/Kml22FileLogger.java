@@ -51,7 +51,7 @@ public class Kml22FileLogger implements FileLogger {
     }
 
 
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
         Kml22WriteHandler writeHandler = new Kml22WriteHandler(loc, kmlFile, addNewTrackSegment);
         EXECUTOR.execute(writeHandler);
     }

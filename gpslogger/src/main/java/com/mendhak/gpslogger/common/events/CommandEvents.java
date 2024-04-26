@@ -30,6 +30,8 @@ public class CommandEvents {
     public static class RequestToggle {
     }
 
+    public static class requestZeroRotation {
+    }
     /**
      * Requests starting the logging service
      */

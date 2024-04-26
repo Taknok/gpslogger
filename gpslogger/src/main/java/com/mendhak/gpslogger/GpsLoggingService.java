@@ -25,6 +25,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.*;
@@ -50,10 +54,11 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 @SuppressLint("MissingPermission")
-public class GpsLoggingService extends Service  {
+public class GpsLoggingService extends Service implements SensorEventListener {
     private static NotificationManager notificationManager;
     private static int NOTIFICATION_ID = 8675309;
     private final IBinder binder = new GpsLoggingBinder();
@@ -102,6 +107,18 @@ public class GpsLoggingService extends Service  {
 
         registerEventBus();
         registerConscryptProvider();
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+
+        if (rotation == null) {
+            rotation = new float[3]; //Azimuth, Pitch, Roll
+            Arrays.fill(rotation, 0);
+        }
+        if (rotationOffset == null) {
+            rotationOffset = new float[rotation.length];
+            Arrays.fill(rotationOffset, 0);
+        }
     }
 
 
@@ -138,6 +155,10 @@ public class GpsLoggingService extends Service  {
         if(session.isStarted() && gpsLocationListener == null && towerLocationListener == null && passiveLocationListener == null) {
             LOG.warn("App might be recovering from an unexpected stop.  Starting logging again.");
             startLogging();
+        }
+
+        if (rotationSensor != null) {
+            sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         handleIntent(intent);
@@ -1072,6 +1093,29 @@ public class GpsLoggingService extends Service  {
 
     }
 
+    private SensorManager sensorManager;
+    private Sensor rotationSensor;
+
+    private float[] rotation;
+    private float[] rotationOffset;
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                float[] rotationMatrix = new float[9];
+                SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+                SensorManager.getOrientation(rotationMatrix, rotation);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Not used, but required to implement SensorEventListener
+    }
 
     /**
      * Calls file helper to write a given location to a file.
@@ -1083,7 +1127,12 @@ public class GpsLoggingService extends Service  {
 
         try {
             LOG.debug("Calling file writers");
-            FileLoggerFactory.write(getApplicationContext(), loc);
+            float [] recalculatedRotation = new float[rotation.length];
+            for(int i =0; i< recalculatedRotation.length; i++)
+            {
+                recalculatedRotation[i] = rotation[i] - rotationOffset[i];
+            }
+            FileLoggerFactory.write(getApplicationContext(), loc, recalculatedRotation);
 
             if (session.hasDescription()) {
                 LOG.info("Writing annotation: " + session.getDescription());
@@ -1134,6 +1183,17 @@ public class GpsLoggingService extends Service  {
         } else {
             startLogging();
         }
+    }
+
+    @EventBusHook
+    public void onEvent(CommandEvents.requestZeroRotation requestZeroRotation) {
+        zeroRotation();
+    }
+
+    protected void zeroRotation() {
+        rotationOffset = Arrays.copyOf(rotation, rotation.length);
+        LOG.debug("New rotationOffset:" + rotationOffset[0] +" - " + rotationOffset[1] + " - " + rotationOffset[2]);
+        EventBus.getDefault().post(new ServiceEvents.RotationOffsetUpdate(rotationOffset));
     }
 
     @EventBusHook

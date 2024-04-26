@@ -29,7 +29,7 @@ public class GeoJSONLogger implements FileLogger {
     }
 
     @Override
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
         annotate(null, loc);
     }
 

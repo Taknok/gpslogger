@@ -48,7 +48,7 @@ public class OpenGTSLogger implements FileLogger {
     }
 
     @Override
-    public void write(Location loc) throws Exception {
+    public void write(Location loc, float[] rotation) throws Exception {
 
         OpenGTSManager manager = new OpenGTSManager(preferenceHelper, batteryLevel);
         manager.sendLocations(new SerializableLocation[]{new SerializableLocation(loc)});

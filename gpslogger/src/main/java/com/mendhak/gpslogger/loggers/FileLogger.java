@@ -23,7 +23,7 @@ import android.location.Location;
 
 public interface FileLogger {
 
-    void write(Location loc) throws Exception;
+    void write(Location loc, float[] rotation) throws Exception;
 
     void annotate(String description, Location loc) throws Exception;
 
