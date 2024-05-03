@@ -40,7 +40,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "com.mendhak.gpslogger"
+        applicationId "com.deeperwire.gpslogger"
         minSdkVersion 16
         targetSdkVersion 30
 

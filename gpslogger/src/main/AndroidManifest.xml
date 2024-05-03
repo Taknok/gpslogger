@@ -55,7 +55,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:windowSoftInputMode="adjustNothing"
+            android:windowSoftInputMode="adjustPan"
             android:clearTaskOnLaunch="true"
             android:exported="true"
             >

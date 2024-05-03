@@ -12,7 +12,7 @@
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="log_gpx_11"
         android:summary="@string/log_gpx_11_summary"
         android:title="@string/log_gpx_11_title"
