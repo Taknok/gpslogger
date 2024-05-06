@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    package="com.mendhak.gpslogger"
+    package="com.deeperwire.gpslogger"
     >
 
     <!-- Satellite and network location services -->
@@ -35,22 +35,22 @@
         android:icon="@mipmap/gpsloggericon3"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="com.mendhak.gpslogger.common.AppSettings"
+        android:name="com.deeperwire.gpslogger.common.AppSettings"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         >
 
 
-        <service android:name=".GpsLoggingService"  android:exported="true" android:stopWithTask="false" android:foregroundServiceType="location">
+        <service android:name="com.deeperwire.gpslogger.GpsLoggingService"  android:exported="true" android:stopWithTask="false" android:foregroundServiceType="location">
             <intent-filter>
-                <action android:name="com.mendhak.gpslogger.GpsLoggingService" />
+                <action android:name="com.deeprwire.gpslogger.GpsLoggingService" />
             </intent-filter>
         </service>
 
 
 
         <activity
-            android:name=".GpsMainActivity"
+            android:name="com.deeperwire.gpslogger.GpsMainActivity"
             android:configChanges="locale"
             android:label="@string/app_name"
             android:launchMode="singleTask"
@@ -64,7 +64,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.mendhak.gpslogger.HANDLE_AUTHORIZATION_RESPONSE"/>
+                <action android:name="com.deeperwire.gpslogger.HANDLE_AUTHORIZATION_RESPONSE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <meta-data android:name="android.app.shortcuts"
@@ -77,45 +77,45 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="com.mendhak.gpslogger"
+                <data android:scheme="com.deeperwire.gpslogger"
                     android:path="/oauth2googledrive"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="oauth2openstreetmap" android:scheme="com.mendhak.gpslogger" />
+                <data android:host="oauth2openstreetmap" android:scheme="com.deeperwire.gpslogger" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".MainPreferenceActivity"
+            android:name="com.deeperwire.gpslogger.MainPreferenceActivity"
             android:label="@string/settings_screen_name"
-            android:parentActivityName=".GpsMainActivity" >
+            android:parentActivityName="com.deeperwire.gpslogger.GpsMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.mendhak.gpslogger.GpsMainActivity" />
+                android:value="com.deeperwire.gpslogger.GpsMainActivity" />
 
         </activity>
 
         <activity
-            android:name=".Faqtivity"
+            android:name="com.deeperwire.gpslogger.Faqtivity"
             android:label="@string/faq_screen_title"
             android:launchMode="singleTask"
-            android:parentActivityName=".GpsMainActivity" >
+            android:parentActivityName="com.deeperwire.gpslogger.GpsMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.mendhak.gpslogger.GpsMainActivity" />
+                android:value="com.deeperwire.gpslogger.GpsMainActivity" />
         </activity>
 
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask"
-            android:parentActivityName=".GpsMainActivity" >
+            android:parentActivityName="com.deeperwire.gpslogger.GpsMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.mendhak.gpslogger.GpsMainActivity" />
+                android:value="com.deeperwire.gpslogger.GpsMainActivity" />
 
             <intent-filter>
                 <!-- Set from build.gradle, see defaultConfig -->
@@ -130,7 +130,7 @@
         </activity>
 
         <activity
-            android:name=".shortcuts.ShortcutCreate"
+            android:name="com.deeperwire.gpslogger.shortcuts.ShortcutCreate"
             android:theme="@style/Theme.AppCompat.Translucent" >
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
@@ -139,14 +139,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".shortcuts.ShortcutStart"
+            android:name="com.deeperwire.gpslogger.shortcuts.ShortcutStart"
             android:theme="@style/Theme.AppCompat.Translucent" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".shortcuts.ShortcutStop"
+            android:name="com.deeperwire.gpslogger.shortcuts.ShortcutStop"
             android:theme="@style/Theme.AppCompat.Translucent" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -154,7 +154,7 @@
         </activity>
 
         <receiver
-            android:name=".StartupReceiver"
+            android:name="com.deeperwire.gpslogger.StartupReceiver"
             android:enabled="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter>
@@ -163,41 +163,41 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".senders.AlarmReceiver" />
+        <receiver android:name="com.deeperwire.gpslogger.senders.AlarmReceiver" />
 
-        <receiver android:name=".MyPackageUpgradeReceiver">
+        <receiver android:name="com.deeperwire.gpslogger.MyPackageUpgradeReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".TaskerReceiver">
+        <receiver android:name="com.deeperwire.gpslogger.TaskerReceiver">
             <intent-filter>
-                <action android:name="com.mendhak.gpslogger.TASKER_COMMAND" />
+                <action android:name="com.deeperwire.gpslogger.TASKER_COMMAND" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".RestarterReceiver" android:enabled="true" android:exported="false" />
+        <receiver android:name="com.deeperwire.gpslogger.RestarterReceiver" android:enabled="true" android:exported="false" />
 
         <!--android:theme="@style/Theme.AppCompat.Translucent"-->
         <activity
-            android:name=".NotificationAnnotationActivity"
+            android:name="com.deeperwire.gpslogger.NotificationAnnotationActivity"
             android:label=""
             android:theme="@style/Theme.AppCompat.Translucent"
             android:excludeFromRecents="true"
             >
             <intent-filter>
                 <action android:name="android.intent.category.DEFAULT" />
-                <category android:name="com.mendhak.gpslogger.NOTIFICATION_BUTTON" />
+                <category android:name="com.deeperwire.gpslogger.NOTIFICATION_BUTTON" />
             </intent-filter>
         </activity>
 
-        <provider android:name=".common.ContentApi" android:authorities="com.mendhak.gpslogger" android:exported="true"
+        <provider android:name="com.deeperwire.gpslogger.common.ContentApi" android:authorities="com.deeperwire.gpslogger" android:exported="true"
                   tools:ignore="ExportedContentProvider"/>
 
         <provider
-            android:name="com.mendhak.gpslogger.common.GpsLoggerFileProvider"
-            android:authorities="com.mendhak.gpslogger.fileprovider"
+            android:name="com.deeperwire.gpslogger.common.GpsLoggerFileProvider"
+            android:authorities="com.deeperwire.gpslogger.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -206,7 +206,7 @@
         </provider>
 
 
-        <activity android:name=".ProfileLinkReceiverActivity" android:theme="@style/Theme.AppCompat.Translucent" >
+        <activity android:name="com.deeperwire.gpslogger.ProfileLinkReceiverActivity" android:theme="@style/Theme.AppCompat.Translucent" >
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

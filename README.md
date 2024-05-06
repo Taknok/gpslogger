@@ -109,8 +109,8 @@ Fill in the form with these details. Remember to uncheck the 'Confidential Appli
 ![Oauth settings](assets/osm_oauth_settings.png)
 
 After registering the application, you will receive a Client ID.   
-Place the Client ID in [OpenStreetMapManager#getOpenStreetMapClientID\(\)](gpslogger/src/main/java/com/mendhak/gpslogger/senders/osm/OpenStreetMapManager.java).   
-If you used your own custom scheme, replace the value in [AndroidManifest.xml](gpslogger/src/main/AndroidManifest.xml) and [OpenStreetMapManager#getOpenStreetMapRedirect\(\)](gpslogger/src/main/java/com/mendhak/gpslogger/senders/osm/OpenStreetMapManager.java) 
+Place the Client ID in [OpenStreetMapManager#getOpenStreetMapClientID\(\)](gpslogger/src/main/java/com/deeperwire/gpslogger/senders/osm/OpenStreetMapManager.java).   
+If you used your own custom scheme, replace the value in [AndroidManifest.xml](gpslogger/src/main/AndroidManifest.xml) and [OpenStreetMapManager#getOpenStreetMapRedirect\(\)](gpslogger/src/main/java/com/deeperwire/gpslogger/senders/osm/OpenStreetMapManager.java) 
 
 
 ### Dropbox Setup (Optional)
