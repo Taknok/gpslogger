@@ -30,7 +30,12 @@ public class CommandEvents {
     public static class RequestToggle {
     }
 
-    public static class requestZeroRotation {
+    public static class RequestZeroRotation {
+    }
+
+    public static class RequestManualRotation {
+        public float[] manualRotationOffset;
+        public RequestManualRotation(float[] manualRotationOffset) { this.manualRotationOffset = manualRotationOffset; }
     }
     /**
      * Requests starting the logging service

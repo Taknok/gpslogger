@@ -9,8 +9,6 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.0'
 
-        classpath 'org.jacoco:org.jacoco.core:0.7.4.201502262128'
-        classpath "com.moowork.gradle:gradle-node-plugin:0.13"
     }
 }
 
@@ -23,7 +21,6 @@ apply plugin: 'signing'
 apply from: 'buildtools/ColoredOutput.gradle'
 project.ext.set("GHACTIONS_FOLDING", true)
 //Generate help pages
-apply plugin: 'com.moowork.node'
 
 repositories {
     mavenCentral()
@@ -48,7 +45,7 @@ android {
         versionName "130"
 
         manifestPlaceholders = [
-                appAuthRedirectScheme: 'com.mendhak.gpslogger'
+                appAuthRedirectScheme: 'com.deeperwire.gpslogger'
         ]
     }
 
@@ -64,6 +61,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             debuggable false
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -74,7 +72,7 @@ android {
     lint {
         abortOnError false
     }
-    namespace 'com.mendhak.gpslogger'
+    namespace 'com.deeperwire.gpslogger'
 
 
     //Release signing key
@@ -153,7 +151,7 @@ dependencies {
 
     // Simple Dialog Fragments, replacing Material Dialogs.
 //    implementation 'io.github.eltos:simpledialogfragments:3.4'
-    implementation 'com.github.eltos:SimpleDialogFragments:v3.5'
+    implementation 'com.github.eltos:simpledialogfragments:v3.5'
 
     //The material drawer
     implementation('com.mikepenz:materialdrawer:4.6.4@aar') {
@@ -271,66 +269,3 @@ tasks.whenTaskAdded { task ->
 }
 
 
-task buildDocs(group: "docs", type: NodeTask, dependsOn:"installNodeModules") {
-    script = file('../assets/generate-pages/index.js')
-    execOverrides {
-        it.workingDir = '../assets/generate-pages'
-    }
-}
-
-task installNodeModules(group:"docs", type:NpmTask){
-    args = ['install']
-    execOverrides {
-        it.workingDir = '../assets/generate-pages'
-    }
-}
-
-task copyFAQsIntoAssets(group:"docs", type:Copy){
-    from '../assets/text/faq'
-    into 'src/main/assets/faq/'
-    include('*.md')
-}
-
-task deleteFAQsAssets(group:"docs", type:Delete){
-    def dirName = 'src/main/assets/faq'
-    fileTree( dirName ).include('**/*.md').each{
-            f -> delete f
-        }
-}
-
-task copyFinalAPK(group:'build') {
-    //Copies final APK to this directory
-    def finalApkName = "gpslogger-"+android.defaultConfig.versionName+".apk"
-
-    copy{
-        from "build/outputs/apk/release/gpslogger-release.apk"
-        into "./"
-
-        // Use a closure to map the file name
-        rename { String fileName ->
-            fileName.replace("gpslogger-release.apk", finalApkName)
-        }
-    }
-        //PGP Sign
-        //Verify with gpg --verify ~/Downloads/gpslogger-71.apk.asc
-    if(file(finalApkName).isFile()){
-        signing {
-            useGpgCmd()
-            sign file(finalApkName)
-        }
-
-        //SHA256 Checksum
-        //Verify with sha256sum -c ~/Downloads/gpslogger-71.apk.SHA256
-        ant.checksum(file: finalApkName, fileext: '.SHA256', algorithm: "SHA-256", pattern: "{0} {1}")
-    }
-
-}
-
-preBuild.dependsOn copyFAQsIntoAssets
-clean.dependsOn deleteFAQsAssets
-
-task deleteReleaseAPKs(group:"build", type:Delete){
-    delete fileTree(dir:'./', include:'*.apk*')
-}
-
-clean.dependsOn deleteReleaseAPKs

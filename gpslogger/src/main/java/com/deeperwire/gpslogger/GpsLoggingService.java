@@ -115,9 +115,13 @@ public class GpsLoggingService extends Service implements SensorEventListener {
             rotation = new float[3]; //Azimuth, Pitch, Roll
             Arrays.fill(rotation, 0);
         }
-        if (rotationOffset == null) {
-            rotationOffset = new float[rotation.length];
-            Arrays.fill(rotationOffset, 0);
+        if (zeroRotationOffset == null) {
+            zeroRotationOffset = new float[rotation.length];
+            Arrays.fill(zeroRotationOffset, 0);
+        }
+        if (manualRotationOffset == null) {
+            manualRotationOffset = new float[rotation.length];
+            Arrays.fill(manualRotationOffset, 0);
         }
     }
 
@@ -1097,7 +1101,9 @@ public class GpsLoggingService extends Service implements SensorEventListener {
     private Sensor rotationSensor;
 
     private float[] rotation;
-    private float[] rotationOffset;
+    private float[] zeroRotationOffset;
+
+    private float[] manualRotationOffset;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -1130,7 +1136,7 @@ public class GpsLoggingService extends Service implements SensorEventListener {
             float [] recalculatedRotation = new float[rotation.length];
             for(int i =0; i< recalculatedRotation.length; i++)
             {
-                recalculatedRotation[i] = rotation[i] - rotationOffset[i];
+                recalculatedRotation[i] = rotation[i] - zeroRotationOffset[i] - manualRotationOffset[i];
             }
             FileLoggerFactory.write(getApplicationContext(), loc, recalculatedRotation);
 
@@ -1186,14 +1192,24 @@ public class GpsLoggingService extends Service implements SensorEventListener {
     }
 
     @EventBusHook
-    public void onEvent(CommandEvents.requestZeroRotation requestZeroRotation) {
+    public void onEvent(CommandEvents.RequestZeroRotation requestZeroRotation) {
         zeroRotation();
     }
 
+    @EventBusHook
+    public void onEvent(CommandEvents.RequestManualRotation requestManualRotation) {
+        manualRotation(requestManualRotation.manualRotationOffset);
+    }
+
     protected void zeroRotation() {
-        rotationOffset = Arrays.copyOf(rotation, rotation.length);
-        LOG.debug("New rotationOffset:" + rotationOffset[0] +" - " + rotationOffset[1] + " - " + rotationOffset[2]);
-        EventBus.getDefault().post(new ServiceEvents.RotationOffsetUpdate(rotationOffset));
+        zeroRotationOffset = Arrays.copyOf(rotation, rotation.length);
+        LOG.debug("New rotationOffset:" + zeroRotationOffset[0] +" - " + zeroRotationOffset[1] + " - " + zeroRotationOffset[2]);
+        EventBus.getDefault().post(new ServiceEvents.RotationOffsetUpdate(zeroRotationOffset));
+    }
+
+    protected void manualRotation(float[] manualRotation ) {
+        manualRotationOffset = Arrays.copyOf(manualRotation, manualRotation.length);
+        LOG.debug("New manualRotationOffset:" + manualRotationOffset[0] +" - " + manualRotationOffset[1] + " - " + manualRotationOffset[2]);
     }
 
     @EventBusHook

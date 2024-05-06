@@ -90,7 +90,11 @@ public abstract class GenericViewFragment extends Fragment {
     }
 
     public void requestZeroRotation() {
-        EventBus.getDefault().post(new CommandEvents.requestZeroRotation());
+        EventBus.getDefault().post(new CommandEvents.RequestZeroRotation());
+    }
+
+    public void requestManualRotation(float[] manualRotation) {
+        EventBus.getDefault().post(new CommandEvents.RequestManualRotation(manualRotation));
     }
 
     public void requestToggleLogging() {

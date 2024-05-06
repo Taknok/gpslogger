@@ -25,9 +25,13 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.dd.processbutton.iml.ActionProcessButton;
@@ -65,9 +69,6 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
     private float[] mRotationOffset;
 
-    private float[] mManualOffset;
-
-
     public static GpsDetailedViewFragment newInstance() {
 
         GpsDetailedViewFragment fragment = new GpsDetailedViewFragment();
@@ -76,8 +77,6 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
         fragment.setArguments(bundle);
         return fragment;
-
-
     }
 
 
@@ -93,9 +92,9 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         zeroRotationButton.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accentColor ));
 
         manualOffsetButtons = new EditText[3];
-        manualOffsetButtons[0] = rootView.findViewById(R.id.detailedview_offset_azimuth);
-        manualOffsetButtons[1] = rootView.findViewById(R.id.detailedview_offset_pitch);
-        manualOffsetButtons[2] = rootView.findViewById(R.id.detailedview_offset_roll);
+        manualOffsetButtons[0] = rootView.findViewById(R.id.detailedview_manual_offset_azimuth);
+        manualOffsetButtons[1] = rootView.findViewById(R.id.detailedview_manual_offset_pitch);
+        manualOffsetButtons[2] = rootView.findViewById(R.id.detailedview_manual_offset_roll);
 
 
         actionButton.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +111,36 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
             }
         });
 
+        for (EditText manualBtn:
+             manualOffsetButtons) {
+            manualBtn.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                private float parseManual(EditText Btn) {
+                    String temp = Btn.getText().toString().isEmpty() ? "0" : Btn.getText().toString();
+                    try {
+                        return Float.parseFloat(temp);
+                    } catch (NumberFormatException e) {
+                        return 0.0F;
+                    }
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    float[] manualOffset = new float[3];
+                    manualOffset[0] = parseManual(manualOffsetButtons[0]);
+                    manualOffset[1] = parseManual(manualOffsetButtons[1]);
+                    manualOffset[2] = parseManual(manualOffsetButtons[2]);
+                    requestManualRotation(manualOffset);
+                }
+            });
+        }
+
         if (session.hasValidLocation()) {
             displayLocationInfo(session.getCurrentLocationInfo());
         }
@@ -121,10 +150,6 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         mRotationOffset = new float[3];
         Arrays.fill(mRotationOffset, 0);
         showRotationOffset();
-
-        mManualOffset = new float[3];
-        Arrays.fill(mManualOffset, 0);
-        showManualOffset();
 
         return rootView;
     }
@@ -188,7 +213,6 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
         showPreferencesAndMessages();
         showRotationOffset();
-        showManualOffset();
         super.onResume();
     }
 
@@ -316,12 +340,6 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
         txtRotAzimuth.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[0]))));
         txtRotPitch.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[1]))));
         txtRotRoll.setText(String.format("%s°", Double.toString(Math.toDegrees(mRotationOffset[2]))));
-    }
-
-    private void showManualOffset() {
-        manualOffsetButtons[0].setText(String.format("%s", Math.toDegrees(mManualOffset[0])));
-        manualOffsetButtons[1].setText(String.format("%s", Math.toDegrees(mManualOffset[1])));
-        manualOffsetButtons[2].setText(String.format("%s", Math.toDegrees(mManualOffset[2])));
     }
 
     public void showCurrentFileName(String newFileName) {
