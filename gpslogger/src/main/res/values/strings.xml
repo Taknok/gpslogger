@@ -499,5 +499,8 @@
     <string name="txt_manual_rotation_azimuth">Manual Offset Azimuth</string>
     <string name="txt_manual_rotation_pitch">Manual Offset Pitch\n</string>
     <string name="txt_manual_rotation_roll">Manual Offset Roll\n</string>
+    <string name="txt_current_rotation_azimuth">Current Azimuth</string>
+    <string name="txt_current_rotation_pitch">Current Pitch</string>
+    <string name="txt_current_rotation_roll">Current Roll</string>
 
 </resources>

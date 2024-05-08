@@ -35,6 +35,13 @@ public class ServiceEvents {
         }
     }
 
+    public static class RotationUpdate {
+        public float[] rotation;
+        public RotationUpdate(float[] rotation) {
+            this.rotation = rotation;
+        }
+    }
+
     public static class RotationOffsetUpdate {
         public float[] rotationOffset;
         public RotationOffsetUpdate(float[] rotationOffset) { this.rotationOffset = rotationOffset; }

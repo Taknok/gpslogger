@@ -33,6 +33,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.dd.processbutton.iml.ActionProcessButton;
 import com.deeperwire.gpslogger.R;
@@ -48,7 +50,9 @@ import com.deeperwire.gpslogger.loggers.Files;
 import com.deeperwire.gpslogger.senders.FileSenderFactory;
 import org.slf4j.Logger;
 
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -125,7 +129,7 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
                 private float parseManual(EditText Btn) {
                     String temp = Btn.getText().toString().isEmpty() ? "0" : Btn.getText().toString();
                     try {
-                        return Float.parseFloat(temp);
+                        return (float) Math.toRadians(Float.parseFloat(temp));
                     } catch (NumberFormatException e) {
                         return 0.0F;
                     }
@@ -396,6 +400,11 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
     }
 
     @EventBusHook
+    public void onEventMainThread(ServiceEvents.RotationUpdate rotationEvent) {
+        displayRotationInfo(rotationEvent.rotation);
+    }
+
+    @EventBusHook
     public void onEventMainThread(ServiceEvents.RotationOffsetUpdate rotationOffsetEvent){
         mRotationOffset = rotationOffsetEvent.rotationOffset;
         showRotationOffset();
@@ -513,6 +522,22 @@ public class GpsDetailedViewFragment extends GenericViewFragment {
 
 
 
+    }
+
+    public void displayRotationInfo(float[] rotationInfo){
+        if (rotationInfo.length == 0) {
+            return;
+        }
+
+        TextView currentAzimuth = (TextView) rootView.findViewById(R.id.detailedview_current_rotation_azimuth_text);
+        TextView currentPitch = (TextView) rootView.findViewById(R.id.detailedview_current_rotation_pitch_text);
+        TextView currentRoll = (TextView) rootView.findViewById(R.id.detailedview_current_rotation_roll_text);
+
+        DecimalFormat df = new DecimalFormat("#.###");
+
+        currentAzimuth.setText(String.format("%s°", df.format(Math.toDegrees(rotationInfo[0]))));
+        currentPitch.setText(String.format("%s°", df.format(Math.toDegrees(rotationInfo[1]))));
+        currentRoll.setText(String.format("%s°", df.format(Math.toDegrees(rotationInfo[2]))));
     }
 
 

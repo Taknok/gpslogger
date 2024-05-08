@@ -1112,6 +1112,7 @@ public class GpsLoggingService extends Service implements SensorEventListener {
                 float[] rotationMatrix = new float[9];
                 SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
                 SensorManager.getOrientation(rotationMatrix, rotation);
+                EventBus.getDefault().post(new ServiceEvents.RotationUpdate(recalulateRotation()));
                 break;
             default:
                 break;
@@ -1121,6 +1122,15 @@ public class GpsLoggingService extends Service implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Not used, but required to implement SensorEventListener
+    }
+
+    private float[] recalulateRotation() {
+        float [] recalculatedRotation = new float[rotation.length];
+        for(int i =0; i< recalculatedRotation.length; i++)
+        {
+            recalculatedRotation[i] = rotation[i] - zeroRotationOffset[i] - manualRotationOffset[i];
+        }
+        return recalculatedRotation;
     }
 
     /**
@@ -1133,11 +1143,8 @@ public class GpsLoggingService extends Service implements SensorEventListener {
 
         try {
             LOG.debug("Calling file writers");
-            float [] recalculatedRotation = new float[rotation.length];
-            for(int i =0; i< recalculatedRotation.length; i++)
-            {
-                recalculatedRotation[i] = rotation[i] - zeroRotationOffset[i] - manualRotationOffset[i];
-            }
+
+            float[] recalculatedRotation = recalulateRotation();
             FileLoggerFactory.write(getApplicationContext(), loc, recalculatedRotation);
 
             if (session.hasDescription()) {
